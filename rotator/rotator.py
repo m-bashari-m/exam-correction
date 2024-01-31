@@ -1,31 +1,18 @@
 import cv2
 import numpy as np
 
+from utils import get_contours
+
 
 class Rotator:
-    def __init__(self, gaussian_ksize=(5, 5), canny_min=75, canny_max=200, polygon_tolerance=0.2):
-        self._gaussian_ksize = gaussian_ksize
-        self._canny_min = canny_max
-        self._canny_max = canny_max
+    def __init__(self, polygon_tolerance=0.2):
         self._polygon_tolerance = polygon_tolerance
 
     def process_paper_image(self, image_path):
-        # Read the image
         image = cv2.imread(image_path)
-        # Convert to grayscale
-        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
-        # Noise reduction
-        blurred = cv2.GaussianBlur(gray, (5, 5), 0)
+        contours = get_contours(image)
 
-        # Edge detection
-        edged = cv2.Canny(blurred, 75, 200)
-
-        # Find contours and sort them by size
-        contours, _ = cv2.findContours(edged.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
-        contours = sorted(contours, key=cv2.contourArea, reverse=True)[:5]
-
-        # Find the contour of the paper
         for c in contours:
             peri = cv2.arcLength(c, True)
             approx = cv2.approxPolyDP(c, 0.02 * peri, True)
@@ -80,7 +67,3 @@ class Rotator:
             warped = cv2.rotate(warped, cv2.ROTATE_90_CLOCKWISE)
 
         return warped
-
-# rotation = Rotator()
-# processed = rotation.process_paper_image("images/high-res/1.jpg")
-# cv2.imwrite("images/processed/1.jpg", processed)
