@@ -35,3 +35,8 @@ def get_contours(image, select_top_n=5, gaussian_ksize=(5, 5), canny_min=75, can
     contours = sorted(contours, key=cv2.contourArea, reverse=True)[:select_top_n]
 
     return contours
+
+
+def save_blocks(dest, blocks):
+    for i, block in enumerate(blocks):
+        cv2.imwrite(f'{dest}_{i}.png', block)
