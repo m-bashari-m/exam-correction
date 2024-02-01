@@ -1,6 +1,6 @@
 import os
-
 import cv2
+from keras.saving import load_model
 
 
 # It gets a folder path and call a callback function for each file inside it.
@@ -40,3 +40,13 @@ def get_contours(image, select_top_n=5, gaussian_ksize=(5, 5), canny_min=75, can
 def save_blocks(dest, blocks):
     for i, block in enumerate(blocks):
         cv2.imwrite(f'{dest}_{i}.png', block)
+
+
+def preprocess_for_model(image):
+    # resize to 80,80
+    image = cv2.resize(image, (80, 80))
+    # normalize the image
+    image = image.astype('float32') / 255
+    # reshape for predicting
+    image = image.reshape(1, 80, 80, 1)
+    return image
