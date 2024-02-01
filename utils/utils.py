@@ -24,12 +24,12 @@ def get_file_name_from_path(path):
     return file_name_without_extension
 
 
-def get_contours(image, select_top_n=5, gaussian_ksize=(5, 5), canny_min=75, canny_max=200, ):
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+def get_contours(image, select_top_n=5, gaussian_ksize=(5, 5), canny_min=75, canny_max=200, with_processing=True):
+    if with_processing:
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        image = cv2.GaussianBlur(image, gaussian_ksize, 0)
 
-    blurred = cv2.GaussianBlur(gray, gaussian_ksize, 0)
-
-    edged = cv2.Canny(blurred, canny_min, canny_max)
+    edged = cv2.Canny(image, canny_min, canny_max)
 
     contours, _ = cv2.findContours(edged.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
     contours = sorted(contours, key=cv2.contourArea, reverse=True)[:select_top_n]
@@ -39,4 +39,4 @@ def get_contours(image, select_top_n=5, gaussian_ksize=(5, 5), canny_min=75, can
 
 def save_blocks(dest, blocks):
     for i, block in enumerate(blocks):
-        cv2.imwrite(f'{dest}_{i}.png', block)
+        cv2.imwrite(f'{dest}_{i}.jpg', block)
